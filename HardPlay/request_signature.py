@@ -1,3 +1,6 @@
+# Функция для определения подписи запроса.
+
+
 def request_signature(user_request_dumps, api_key, time_request, api_secret):
     from hash import hash_object
 

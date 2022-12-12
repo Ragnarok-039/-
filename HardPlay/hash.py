@@ -1,3 +1,6 @@
+# Функция для вычисления хеша (sha256).
+
+
 def hash_object(temp_str):
     from hashlib import sha256
 
