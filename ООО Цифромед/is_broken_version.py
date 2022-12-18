@@ -7,4 +7,4 @@ def broken_version():
     for i in range(10):
         version_dict.setdefault(i, True if i < bad_index else False)
 
-    print(version_dict)
+    return version_dict, bad_index
