@@ -47,7 +47,7 @@ with profit as
           from (select PKod, Pquantity * Sale_Price as total_price
                 from SELL_1) as temp_table
           group by PKod),
-     consumption as (select sell_pkod.PKod, count_pkod * Average_Buy_price.Buy_price as total_cost
+     consumption as (select sell_pkod.PKod, sell_pkod.count_pkod * Average_Buy_price.Buy_price as total_cost
                      from ((select PKod, sum(Pquantity) as count_pkod
                             from SELL_1
                             group by PKod) as sell_pkod
@@ -60,12 +60,15 @@ from cost_difference
 where cost_difference.cost_difference in (select max(cost_difference) from cost_difference);
 
 /*4. Посчитать среднюю маржу (отношение цены продажи к цене закупки) по всем категориями.
-  Если следовать этому определению - маржу (отношение цены продажи к цене закупки), то код ниже.
+  Если следовать этому определению - 'маржу (отношение цены продажи к цене закупки)', то код ниже.
   Но я не совсем уверен в корректности определения маржи таким образом.
   По крайней мере, гугл говорит другое, но готов обсудить этот момент.*/
 with sell_price as (select PKod, Pquantity, Pquantity * Sale_Price as total_price
                     from SELL_1),
      avg_sell_price as (select PKod, sum(total_price) / sum(Pquantity) as avg_sell_price from sell_price group by PKod)
-select avg_buy_price.P_Code, avg_sell_price.avg_sell_price, avg_buy_price.Buy_price
+select avg_buy_price.P_Code,
+       if(avg_sell_price.avg_sell_price / avg_buy_price.Buy_price is null, 'no_sales',
+          avg_sell_price.avg_sell_price / avg_buy_price.Buy_price) as margin
 from Average_Buy_price as avg_buy_price
-         left join avg_sell_price on avg_buy_price.P_Code = avg_sell_price.PKod;
+         left join avg_sell_price on avg_buy_price.P_Code = avg_sell_price.PKod
+order by avg_buy_price.P_Code;
